@@ -31,13 +31,10 @@ class HomeViewController: UIViewController {
         hostingController.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
     }
     
-    // Define the onButtonTapped SwiftUI action
+    // The onButtonTapped() SwiftUI action
     func navigateToBook() {
-        // TODO: Create UIPageController and push here
-        let pageController = UIViewController()
-        pageController.view.backgroundColor = .systemYellow
-        pageController.title = "Book Pages"
-        
+        // PageViewController manages the actual storybook
+        let pageController = PageViewController()
         navigationController?.pushViewController(pageController, animated: true)
     }
     
