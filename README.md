@@ -4,4 +4,5 @@
 - Slack Username: Spencer Dearman
 
 ## Resources & Attributions
-- N/A
+- Image Generation: https://gemini.google.com/share/9d0704dc3c40
+- 
