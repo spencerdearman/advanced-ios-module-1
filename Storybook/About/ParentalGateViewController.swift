@@ -94,15 +94,22 @@ class ParentalGateViewController: UIViewController {
             instructionLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
 
             drawingView.topAnchor.constraint(equalTo: instructionLabel.bottomAnchor, constant: 20),
-            drawingView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
-            drawingView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
-            drawingView.heightAnchor.constraint(equalTo: drawingView.widthAnchor),
+            drawingView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            drawingView.leadingAnchor.constraint(greaterThanOrEqualTo: view.leadingAnchor, constant: 20),
+            drawingView.trailingAnchor.constraint(lessThanOrEqualTo: view.trailingAnchor, constant: -20),
+            drawingView.widthAnchor.constraint(equalTo: drawingView.heightAnchor),
+            drawingView.bottomAnchor.constraint(lessThanOrEqualTo: retryButton.topAnchor, constant: -28),
+            {
+                let c = drawingView.bottomAnchor.constraint(equalTo: retryButton.topAnchor, constant: -28)
+                c.priority = .defaultLow
+                return c
+            }(),
 
-            statusLabel.topAnchor.constraint(equalTo: drawingView.bottomAnchor, constant: 16),
+            statusLabel.bottomAnchor.constraint(equalTo: retryButton.topAnchor, constant: -12),
             statusLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             statusLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
 
-            retryButton.topAnchor.constraint(equalTo: statusLabel.bottomAnchor, constant: 12),
+            retryButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -12),
             retryButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
         ])
 

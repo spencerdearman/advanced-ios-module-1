@@ -2,51 +2,78 @@
 //  HomeViewController.swift
 //  Storybook
 //
-//  Created by Spencer Dearman on 3/30/26.
-//
 
 import SwiftUI
 import UIKit
 
 class HomeViewController: UIViewController {
-    
+
+    private var hostingController: UIHostingController<HomeView>?
+
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        // Initialize the SwiftUI view and define the navigation action
-        let homeView = HomeView { [weak self] in
-            self?.navigateToBook()
-        }
-        
-        // Wrap the SwiftUI view in a UIHostingController
-        let hostingController = UIHostingController(rootView: homeView)
-        
-        // Add the hosting controller to the UIKit view hierarchy
-        addChild(hostingController)
-        view.addSubview(hostingController.view)
-        hostingController.didMove(toParent: self)
-        
-        // Set frame to entire screen size
-        hostingController.view.frame = view.bounds
-        hostingController.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        setupHomeView()
     }
-    
-    // The onButtonTapped() SwiftUI action
+
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.setNavigationBarHidden(true, animated: animated)
+        refreshHomeView()
+    }
+
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        navigationController?.setNavigationBarHidden(false, animated: animated)
+    }
+
+    private func setupHomeView() {
+        let hc = UIHostingController(rootView: makeHomeView())
+        addChild(hc)
+        view.addSubview(hc.view)
+        hc.didMove(toParent: self)
+        hc.view.frame = view.bounds
+        hc.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        hostingController = hc
+    }
+
+    private func refreshHomeView() {
+        hostingController?.rootView = makeHomeView()
+    }
+
+    private func makeHomeView() -> HomeView {
+        let bookmarkPage = UserDefaults.standard.integer(forKey: "bookmarkPage")
+        return HomeView(
+            bookmarkPage: bookmarkPage,
+            onReadBook: { [weak self] in self?.navigateToBook() },
+            onRestartBook: { [weak self] in self?.navigateToBookStart() },
+            onSettings: { [weak self] in self?.navigateToSettings() },
+            onAboutAuthor: { [weak self] in self?.navigateToAboutAuthor() }
+        )
+    }
+
+    // MARK: - Navigation
+
     func navigateToBook() {
-        // PageViewController manages the actual storybook
         let pageController = PageViewController()
+        let bookmarkPage = UserDefaults.standard.integer(forKey: "bookmarkPage")
+        pageController.initialPage = bookmarkPage
         navigationController?.pushViewController(pageController, animated: true)
     }
-    
-    
-    /*
-     // MARK: - Navigation
-     
-     // In a storyboard-based application, you will often want to do a little preparation before navigation
-     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-     // Get the new view controller using segue.destination.
-     // Pass the selected object to the new view controller.
-     }
-     */
-    
+
+    func navigateToBookStart() {
+        UserDefaults.standard.set(0, forKey: "bookmarkPage")
+        let pageController = PageViewController()
+        pageController.initialPage = 0
+        navigationController?.pushViewController(pageController, animated: true)
+    }
+
+    func navigateToSettings() {
+        let settingsVC = SettingsViewController()
+        navigationController?.pushViewController(settingsVC, animated: true)
+    }
+
+    func navigateToAboutAuthor() {
+        let gateVC = ParentalGateViewController()
+        navigationController?.pushViewController(gateVC, animated: true)
+    }
 }
