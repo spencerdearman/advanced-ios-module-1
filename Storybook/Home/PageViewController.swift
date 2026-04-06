@@ -32,17 +32,46 @@ class PageViewController: UIPageViewController {
         let totalPages = storyPages.count
 
         for (index, storyPage) in storyPages.enumerated() {
-            let pageView = PageView(
-                pageIndex: index,
-                totalPages: totalPages,
-                pageText: storyPage.text,
-                backgroundImage: storyPage.backgroundImage,
-                textPosition: storyPage.textPosition,
-                onReturnHome: { [weak self] in self?.returnToHome() },
-                onNextPage: { [weak self] in self?.goToPage(index + 1, direction: .forward) },
-                onPreviousPage: { [weak self] in self?.goToPage(index - 1, direction: .reverse) }
-            )
-            pages.append(UIHostingController(rootView: pageView))
+            let vc: UIViewController
+
+            switch index {
+            case 0:
+                vc = Page1ViewController(storyPage: storyPage, pageIndex: index, totalPages: totalPages)
+            case 1:
+                vc = Page2ViewController(storyPage: storyPage, pageIndex: index, totalPages: totalPages)
+            case 2:
+                vc = Page3ViewController(storyPage: storyPage, pageIndex: index, totalPages: totalPages)
+            case 3:
+                vc = Page4ViewController(storyPage: storyPage, pageIndex: index, totalPages: totalPages)
+            case 4:
+                vc = Page5ViewController(storyPage: storyPage, pageIndex: index, totalPages: totalPages)
+            case 5:
+                vc = Page6ViewController(storyPage: storyPage, pageIndex: index, totalPages: totalPages)
+            case 6:
+                vc = Page7ViewController(storyPage: storyPage, pageIndex: index, totalPages: totalPages)
+            default:
+                // Fallback to SwiftUI PageView for any additional pages
+                let pageView = PageView(
+                    pageIndex: index,
+                    totalPages: totalPages,
+                    pageText: storyPage.text,
+                    backgroundImage: storyPage.backgroundImage,
+                    textPosition: storyPage.textPosition,
+                    onReturnHome: { [weak self] in self?.returnToHome() },
+                    onNextPage: { [weak self] in self?.goToPage(index + 1, direction: .forward) },
+                    onPreviousPage: { [weak self] in self?.goToPage(index - 1, direction: .reverse) }
+                )
+                vc = UIHostingController(rootView: pageView)
+            }
+
+            // Configure navigation callbacks for custom UIKit page VCs
+            if let storyPageVC = vc as? StoryPageViewController {
+                storyPageVC.onReturnHome = { [weak self] in self?.returnToHome() }
+                storyPageVC.onNextPage = { [weak self] in self?.goToPage(index + 1, direction: .forward) }
+                storyPageVC.onPreviousPage = { [weak self] in self?.goToPage(index - 1, direction: .reverse) }
+            }
+
+            pages.append(vc)
         }
 
         // Start at bookmarked page or first page

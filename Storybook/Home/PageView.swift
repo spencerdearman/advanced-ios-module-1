@@ -36,7 +36,7 @@ struct PageView: View {
             }
             .ignoresSafeArea()
 
-            // Top bar: Home button + page indicator
+            // Top bar: Home button + Read to Me + page indicator
             VStack {
                 HStack {
                     Button(action: {
@@ -53,13 +53,34 @@ struct PageView: View {
                     }
                     .glassEffect(.regular.interactive(), in: .capsule)
 
+                    if showTapToPlay {
+                        Button(action: {
+                            if isCurrentlySpeakingThisPage {
+                                soundManager.stop()
+                            } else {
+                                soundManager.speak(pageText)
+                            }
+                        }) {
+                            HStack(spacing: 6) {
+                                Image(systemName: isCurrentlySpeakingThisPage
+                                      ? "stop.fill" : "play.fill")
+                                Text(isCurrentlySpeakingThisPage
+                                     ? "Stop Reading" : "Read to Me")
+                            }
+                            .font(.subheadline.bold())
+                            .padding(.horizontal, 14)
+                            .padding(.vertical, 8)
+                        }
+                        .glassEffect(.regular.interactive(), in: .capsule)
+                    }
+
                     Spacer()
 
                     Text("Page \(pageIndex + 1) of \(totalPages)")
                         .font(.subheadline.bold())
                         .padding(.horizontal, 14)
                         .padding(.vertical, 8)
-                        .glassEffect(.regular, in: .capsule)
+                        .glassEffect(.regular, in: .rect(cornerRadius:24))
                 }
                 .padding(.horizontal, 20)
                 .padding(.top, 16)
@@ -69,6 +90,7 @@ struct PageView: View {
 
             // Story text positioned based on textPosition
             GeometryReader { geo in
+                let avgColor = Color(uiColor: UIImage(named: backgroundImage)?.averageColor ?? .black)
                 HighlightedText(
                     text: pageText,
                     highlightRange: isCurrentlySpeakingThisPage
@@ -76,9 +98,10 @@ struct PageView: View {
                         : NSRange(location: 0, length: 0),
                     textAlignment: textPosition.textAlignment
                 )
-                .padding(20)
+                .padding(16)
                 .frame(maxWidth: geo.size.width * 0.55)
-                .glassEffect(.regular, in: .rect(cornerRadius: 20))
+                .background(avgColor.opacity(0.8))
+                .clipShape(RoundedRectangle(cornerRadius: 20))
                 .frame(maxWidth: .infinity, maxHeight: .infinity,
                        alignment: textPosition.alignment)
                 .padding(.horizontal, 30)
@@ -88,29 +111,6 @@ struct PageView: View {
             // Bottom controls
             VStack {
                 Spacer()
-
-                // Tap-to-play button
-                if showTapToPlay {
-                    Button(action: {
-                        if isCurrentlySpeakingThisPage {
-                            soundManager.stop()
-                        } else {
-                            soundManager.speak(pageText)
-                        }
-                    }) {
-                        HStack(spacing: 8) {
-                            Image(systemName: isCurrentlySpeakingThisPage
-                                  ? "stop.fill" : "play.fill")
-                            Text(isCurrentlySpeakingThisPage
-                                 ? "Stop Reading" : "Read to Me")
-                        }
-                        .font(.headline)
-                        .padding(.horizontal, 24)
-                        .padding(.vertical, 12)
-                    }
-                    .glassEffect(.regular.interactive(), in: .capsule)
-                    .padding(.bottom, 8)
-                }
 
                 // Page navigation buttons
                 HStack {
@@ -144,7 +144,7 @@ struct PageView: View {
                 .padding(.bottom, 20)
             }
         }
-        .foregroundStyle(.black)
+        .foregroundStyle(.white)
         .onAppear {
             loadSettings()
             if autoPlayEnabled {
@@ -195,11 +195,19 @@ struct HighlightedText: UIViewRepresentable {
         label.textAlignment = nsTextAlignment
         let nsText = text as NSString
 
+        let shadow = NSShadow()
+        shadow.shadowColor = UIColor.black.withAlphaComponent(0.95)
+        shadow.shadowOffset = CGSize(width: 0, height: 1)
+        shadow.shadowBlurRadius = 6
+
         let attributed = NSMutableAttributedString(
             string: text,
             attributes: [
-                .font: UIFont.systemFont(ofSize: 20, weight: .medium),
-                .foregroundColor: UIColor.black,
+                .font: UIFont(name: "ShortStack", size: 20) ?? .systemFont(ofSize: 20, weight: .medium),
+                .foregroundColor: UIColor.white,
+                .shadow: shadow,
+                .strokeColor: UIColor.black.withAlphaComponent(0.3),
+                .strokeWidth: NSNumber(value: -1.5),
             ]
         )
 
@@ -211,7 +219,7 @@ struct HighlightedText: UIViewRepresentable {
                 [
                     .foregroundColor: UIColor.systemYellow,
                     .backgroundColor: UIColor.systemYellow.withAlphaComponent(0.2),
-                    .font: UIFont.systemFont(ofSize: 20, weight: .bold),
+                    .font: UIFont(name: "ShortStack", size: 20) ?? .systemFont(ofSize: 20, weight: .bold),
                 ],
                 range: highlightRange
             )

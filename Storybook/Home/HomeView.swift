@@ -31,7 +31,7 @@ struct HomeView: View {
                 Spacer()
                 Spacer()
 
-                Text("The Incredible Travels of Pico")
+                Text("The Incredible Travels of Tico")
                     .font(.system(size: 42, weight: .bold, design: .serif))
                     .foregroundStyle(.white)
                     .shadow(color: .black.opacity(0.7), radius: 6)

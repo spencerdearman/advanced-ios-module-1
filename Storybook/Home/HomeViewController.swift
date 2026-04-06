@@ -54,17 +54,23 @@ class HomeViewController: UIViewController {
     // MARK: - Navigation
 
     func navigateToBook() {
-        let pageController = PageViewController()
         let bookmarkPage = UserDefaults.standard.integer(forKey: "bookmarkPage")
-        pageController.initialPage = bookmarkPage
-        navigationController?.pushViewController(pageController, animated: true)
+        if bookmarkPage > 0 {
+            // Resume: skip drawing, go straight to story
+            let pageController = PageViewController()
+            pageController.initialPage = bookmarkPage
+            navigationController?.pushViewController(pageController, animated: true)
+        } else {
+            // First time: show drawing page first
+            let drawingVC = DrawingViewController()
+            navigationController?.pushViewController(drawingVC, animated: true)
+        }
     }
 
     func navigateToBookStart() {
         UserDefaults.standard.set(0, forKey: "bookmarkPage")
-        let pageController = PageViewController()
-        pageController.initialPage = 0
-        navigationController?.pushViewController(pageController, animated: true)
+        let drawingVC = DrawingViewController()
+        navigationController?.pushViewController(drawingVC, animated: true)
     }
 
     func navigateToSettings() {
