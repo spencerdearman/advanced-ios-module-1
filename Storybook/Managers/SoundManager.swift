@@ -2,24 +2,26 @@
 //  SoundManager.swift
 //  Storybook
 //
+//  Created by Spencer Dearman.
+//
 
 import AVFoundation
 import Combine
 
 class SoundManager: NSObject, ObservableObject {
     static let shared = SoundManager()
-
+    
     private let synthesizer = AVSpeechSynthesizer()
-
+    
     @Published var currentSpokenRange: NSRange = NSRange(location: 0, length: 0)
     @Published var isSpeaking: Bool = false
     @Published var currentText: String = ""
-
+    
     private override init() {
         super.init()
         synthesizer.delegate = self
     }
-
+    
     func speak(_ text: String) {
         stop()
         currentText = text
@@ -29,7 +31,7 @@ class SoundManager: NSObject, ObservableObject {
         isSpeaking = true
         synthesizer.speak(utterance)
     }
-
+    
     func stop() {
         synthesizer.stopSpeaking(at: .immediate)
         isSpeaking = false
@@ -48,7 +50,7 @@ extension SoundManager: AVSpeechSynthesizerDelegate {
             self.currentSpokenRange = characterRange
         }
     }
-
+    
     nonisolated func speechSynthesizer(
         _ synthesizer: AVSpeechSynthesizer,
         didFinish utterance: AVSpeechUtterance

@@ -2,7 +2,7 @@
 //  ParentalGateErrors.swift
 //  Storybook
 //
-//  Custom ErrorType for parental gate validation failures.
+//  Created by Spencer Dearman.
 //
 
 import Foundation

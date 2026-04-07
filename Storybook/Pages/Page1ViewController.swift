@@ -2,22 +2,21 @@
 //  Page1ViewController.swift
 //  Storybook
 //
-//  Page 1: The Departure (Rio de Janeiro)
-//  Tico starts just above the text and flies toward the top-right of the screen.
+//  Created by Spencer Dearman.
 //
 
 import UIKit
 
 class Page1ViewController: StoryPageViewController {
-
+    
     private var ticoImageView: UIImageView!
     private var hasAnimated = false
-
+    
     override func setupInteractiveContent() {
         ticoImageView = makeTicoImageView(size: CGSize(width: 300, height: 300))
         ticoImageView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(ticoImageView)
-
+        
         // Start position: centered horizontally, just above the text area
         NSLayoutConstraint.activate([
             ticoImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor, constant: -120),
@@ -26,7 +25,7 @@ class Page1ViewController: StoryPageViewController {
             ticoImageView.heightAnchor.constraint(equalToConstant: 300),
         ])
     }
-
+    
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         if !hasAnimated {
@@ -37,7 +36,7 @@ class Page1ViewController: StoryPageViewController {
             }
         }
     }
-
+    
     private func flyAway() {
         // Fly toward the top-right corner
         let destination = CGPoint(
@@ -47,7 +46,7 @@ class Page1ViewController: StoryPageViewController {
         let startCenter = ticoImageView.center
         let dx = destination.x - startCenter.x
         let dy = destination.y - startCenter.y
-
+        
         UIView.animate(
             withDuration: 3.0,
             delay: 0,

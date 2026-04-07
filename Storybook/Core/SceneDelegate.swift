@@ -2,7 +2,7 @@
 //  SceneDelegate.swift
 //  Storybook
 //
-//  Created by Spencer Dearman on 3/30/26.
+//  Created by Spencer Dearman.
 //
 
 import UIKit
@@ -23,6 +23,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let navigationController = UINavigationController(rootViewController: homeViewController)
         
         appWindow.rootViewController = navigationController
+        appWindow.overrideUserInterfaceStyle = .light
         appWindow.makeKeyAndVisible()
         
         // Assign the local appWindow to the class property

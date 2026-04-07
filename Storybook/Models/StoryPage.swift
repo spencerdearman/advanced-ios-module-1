@@ -1,6 +1,9 @@
 //
 //  StoryPage.swift
 //  Storybook
+//
+//  Created by Spencer Dearman.
+//
 
 import SwiftUI
 
@@ -13,7 +16,7 @@ enum TextPosition {
     case centerLeading
     case centerTrailing
     case topCenter
-
+    
     var alignment: Alignment {
         switch self {
         case .topLeading: return .topLeading
@@ -26,7 +29,7 @@ enum TextPosition {
         case .topCenter: return .top
         }
     }
-
+    
     var textAlignment: TextAlignment {
         switch self {
         case .topLeading, .bottomLeading, .centerLeading: return .leading
@@ -34,7 +37,7 @@ enum TextPosition {
         case .topCenter, .bottomCenter: return .center
         }
     }
-
+    
     var horizontalPadding: Edge.Set {
         switch self {
         case .topLeading, .bottomLeading, .centerLeading: return .leading

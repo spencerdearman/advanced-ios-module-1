@@ -2,8 +2,7 @@
 //  ParentalGateViewController.swift
 //  Storybook
 //
-//  UIKit-based parental gate with a connect-the-dots drawing challenge.
-//  Uses custom PatternGestureRecognizer and do-try-throw validation.
+//  Created by Spencer Dearman.
 //
 
 import UIKit
@@ -11,17 +10,17 @@ import UIKit
 // MARK: - Drawing Canvas View
 class DrawingCanvasView: UIView {
     var drawnPath: [CGPoint] = []
-
+    
     override func draw(_ rect: CGRect) {
         super.draw(rect)
         guard drawnPath.count > 1 else { return }
-
+        
         let path = UIBezierPath()
         path.move(to: drawnPath[0])
         for point in drawnPath.dropFirst() {
             path.addLine(to: point)
         }
-
+        
         UIColor.systemOrange.setStroke()
         path.lineWidth = 3
         path.lineCapStyle = .round
@@ -32,21 +31,21 @@ class DrawingCanvasView: UIView {
 
 // MARK: - Parental Gate View Controller
 class ParentalGateViewController: UIViewController {
-
+    
     private var drawingView: DrawingCanvasView!
     private var gestureRecognizer: PatternGestureRecognizer!
     private var instructionLabel: UILabel!
     private var statusLabel: UILabel!
     private var dotViews: [UIView] = []
     private var dotsConfigured = false
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         title = "Parental Gate"
         view.backgroundColor = .systemBackground
         setupUI()
     }
-
+    
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         if !dotsConfigured && drawingView.bounds.width > 0 {
@@ -54,25 +53,25 @@ class ParentalGateViewController: UIViewController {
             setupDots()
         }
     }
-
+    
     // MARK: - UI Setup
-
+    
     private func setupUI() {
         instructionLabel = UILabel()
-        instructionLabel.text = "Connect the dots in order (1 → 2 → … → 9) to continue"
+        instructionLabel.text = "Connect the dots to continue"
         instructionLabel.textAlignment = .center
         instructionLabel.numberOfLines = 0
         instructionLabel.font = .systemFont(ofSize: 18, weight: .medium)
         instructionLabel.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(instructionLabel)
-
+        
         drawingView = DrawingCanvasView()
         drawingView.backgroundColor = .secondarySystemBackground
         drawingView.layer.cornerRadius = 16
         drawingView.clipsToBounds = true
         drawingView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(drawingView)
-
+        
         statusLabel = UILabel()
         statusLabel.text = ""
         statusLabel.textAlignment = .center
@@ -80,19 +79,19 @@ class ParentalGateViewController: UIViewController {
         statusLabel.numberOfLines = 0
         statusLabel.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(statusLabel)
-
+        
         let retryButton = UIButton(type: .system)
         retryButton.setTitle("Reset Drawing", for: .normal)
         retryButton.titleLabel?.font = .systemFont(ofSize: 17, weight: .semibold)
         retryButton.addTarget(self, action: #selector(resetDrawing), for: .touchUpInside)
         retryButton.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(retryButton)
-
+        
         NSLayoutConstraint.activate([
             instructionLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
             instructionLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             instructionLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
-
+            
             drawingView.topAnchor.constraint(equalTo: instructionLabel.bottomAnchor, constant: 20),
             drawingView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             drawingView.leadingAnchor.constraint(greaterThanOrEqualTo: view.leadingAnchor, constant: 20),
@@ -104,32 +103,32 @@ class ParentalGateViewController: UIViewController {
                 c.priority = .defaultLow
                 return c
             }(),
-
+            
             statusLabel.bottomAnchor.constraint(equalTo: retryButton.topAnchor, constant: -12),
             statusLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             statusLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
-
+            
             retryButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -12),
             retryButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
         ])
-
+        
         gestureRecognizer = PatternGestureRecognizer(target: self, action: #selector(handlePattern(_:)))
         drawingView.addGestureRecognizer(gestureRecognizer)
     }
-
+    
     private func setupDots() {
         dotViews.forEach { $0.removeFromSuperview() }
         dotViews.removeAll()
-
+        
         let canvasSize = drawingView.bounds.size
         let padding: CGFloat = 50
-
+        
         // 3x3 grid pattern
         let cols = 3
         let rows = 3
         let xSpacing = (canvasSize.width - padding * 2) / CGFloat(cols - 1)
         let ySpacing = (canvasSize.height - padding * 2) / CGFloat(rows - 1)
-
+        
         var dotPositions: [CGPoint] = []
         for row in 0..<rows {
             for col in 0..<cols {
@@ -139,9 +138,9 @@ class ParentalGateViewController: UIViewController {
                 ))
             }
         }
-
+        
         gestureRecognizer.targetPoints = dotPositions
-
+        
         for (index, position) in dotPositions.enumerated() {
             let dotSize: CGFloat = 50
             let dotView = UIView(frame: CGRect(
@@ -153,42 +152,42 @@ class ParentalGateViewController: UIViewController {
             dotView.backgroundColor = .systemBlue
             dotView.layer.cornerRadius = dotSize / 2
             dotView.isUserInteractionEnabled = false
-
+            
             let label = UILabel(frame: dotView.bounds)
             label.text = "\(index + 1)"
             label.textAlignment = .center
             label.textColor = .white
             label.font = .systemFont(ofSize: 20, weight: .bold)
             dotView.addSubview(label)
-
+            
             drawingView.addSubview(dotView)
             dotViews.append(dotView)
         }
     }
-
+    
     // MARK: - Gesture Handling
-
+    
     @objc private func handlePattern(_ recognizer: PatternGestureRecognizer) {
         switch recognizer.state {
         case .began, .changed:
             drawingView.drawnPath = recognizer.drawnPath
             drawingView.setNeedsDisplay()
-
+            
             // Highlight connected dots
             for (index, dotView) in dotViews.enumerated() {
                 dotView.backgroundColor = recognizer.hitPointIndices.contains(index)
-                    ? .systemGreen : .systemBlue
+                ? .systemGreen : .systemBlue
             }
-
+            
         case .ended:
             drawingView.drawnPath = recognizer.drawnPath
             drawingView.setNeedsDisplay()
-
+            
             do {
                 try validatePattern(recognizer)
                 statusLabel.text = "Access granted!"
                 statusLabel.textColor = .systemGreen
-
+                
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
                     self?.navigateToAboutAuthor()
                 }
@@ -205,32 +204,32 @@ class ParentalGateViewController: UIViewController {
                 statusLabel.text = "Validation failed. Try again."
                 statusLabel.textColor = .systemRed
             }
-
+            
         case .failed:
             drawingView.drawnPath = recognizer.drawnPath
             drawingView.setNeedsDisplay()
             statusLabel.text = "Pattern incomplete. Try again."
             statusLabel.textColor = .systemRed
-
+            
         default:
             break
         }
     }
-
+    
     // MARK: - Validation (do-try-throw)
-
+    
     private func validatePattern(_ recognizer: PatternGestureRecognizer) throws {
         guard !recognizer.drawnPath.isEmpty else {
             throw ParentalGateError.noDrawingDetected
         }
-
+        
         guard recognizer.isPatternComplete else {
             throw ParentalGateError.patternIncomplete(
                 hitCount: recognizer.hitPointIndices.count,
                 requiredCount: gestureRecognizer.targetPoints.count
             )
         }
-
+        
         // Verify points were hit in sequential order
         for (i, index) in recognizer.hitPointIndices.enumerated() {
             guard index == i else {
@@ -238,9 +237,9 @@ class ParentalGateViewController: UIViewController {
             }
         }
     }
-
+    
     // MARK: - Navigation
-
+    
     private func navigateToAboutAuthor() {
         let aboutVC = AboutAuthorViewController()
         // Replace this VC in the nav stack so Back goes to Home, not the gate
@@ -249,7 +248,7 @@ class ParentalGateViewController: UIViewController {
             navigationController?.setViewControllers(viewControllers, animated: true)
         }
     }
-
+    
     @objc private func resetDrawing() {
         drawingView.drawnPath = []
         drawingView.setNeedsDisplay()
