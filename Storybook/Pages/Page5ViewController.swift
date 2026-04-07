@@ -44,22 +44,22 @@ class Page5ViewController: StoryPageViewController {
 
     private func setupMistEmitter() {
         let emitter = CAEmitterLayer()
-        // Emit from off-screen left, spanning the full height
-        emitter.emitterPosition = CGPoint(x: -40, y: view.bounds.midY)
-        emitter.emitterSize = CGSize(width: 1, height: view.bounds.height)
-        emitter.emitterShape = .line
+        // Emit from a wide rectangle across the scene for even fog coverage
+        emitter.emitterPosition = CGPoint(x: view.bounds.midX, y: view.bounds.midY)
+        emitter.emitterSize = CGSize(width: view.bounds.width * 0.8, height: view.bounds.height * 0.6)
+        emitter.emitterShape = .rectangle
 
         let cell = CAEmitterCell()
         cell.contents = createMistImage().cgImage
-        cell.birthRate = 1.5
-        cell.lifetime = 20
-        cell.velocity = 15
-        cell.velocityRange = 8
-        cell.emissionLongitude = 0 // Drifts rightward
-        cell.emissionRange = .pi / 12
+        cell.birthRate = 2
+        cell.lifetime = 14
+        cell.velocity = 8
+        cell.velocityRange = 5
+        cell.emissionLongitude = 0
+        cell.emissionRange = .pi / 4
         cell.scale = 0.6
         cell.scaleRange = 0.3
-        cell.alphaSpeed = -0.03
+        cell.alphaSpeed = -0.04
         cell.color = UIColor.white.withAlphaComponent(0.12).cgColor
 
         emitter.emitterCells = [cell]

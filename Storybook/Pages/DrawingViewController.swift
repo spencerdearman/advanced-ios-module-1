@@ -45,7 +45,7 @@ class DrawingViewController: UIViewController {
 
     private func setupUI() {
         let titleLabel = UILabel()
-        titleLabel.text = "Color Tico!"
+        titleLabel.text = "Color Tico the Toucan"
         titleLabel.font = .systemFont(ofSize: 28, weight: .bold)
         titleLabel.textAlignment = .center
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -76,7 +76,7 @@ class DrawingViewController: UIViewController {
 
         // Buttons
         let flightButton = UIButton(type: .system)
-        flightButton.setTitle(" Take Flight", for: .normal)
+        flightButton.setTitle(" Complete", for: .normal)
         let birdConfig = UIImage.SymbolConfiguration(pointSize: 16, weight: .bold)
         flightButton.setImage(UIImage(systemName: "bird", withConfiguration: birdConfig), for: .normal)
         flightButton.titleLabel?.font = .systemFont(ofSize: 18, weight: .bold)

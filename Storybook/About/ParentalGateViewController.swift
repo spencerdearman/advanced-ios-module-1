@@ -59,7 +59,7 @@ class ParentalGateViewController: UIViewController {
 
     private func setupUI() {
         instructionLabel = UILabel()
-        instructionLabel.text = "Connect the dots in order (1 → 2 → 3 → 4) to continue"
+        instructionLabel.text = "Connect the dots in order (1 → 2 → … → 9) to continue"
         instructionLabel.textAlignment = .center
         instructionLabel.numberOfLines = 0
         instructionLabel.font = .systemFont(ofSize: 18, weight: .medium)
@@ -122,15 +122,23 @@ class ParentalGateViewController: UIViewController {
         dotViews.removeAll()
 
         let canvasSize = drawingView.bounds.size
-        let padding: CGFloat = 60
+        let padding: CGFloat = 50
 
-        // Four corners forming a rectangle pattern
-        let dotPositions: [CGPoint] = [
-            CGPoint(x: padding, y: padding),
-            CGPoint(x: canvasSize.width - padding, y: padding),
-            CGPoint(x: canvasSize.width - padding, y: canvasSize.height - padding),
-            CGPoint(x: padding, y: canvasSize.height - padding),
-        ]
+        // 3x3 grid pattern
+        let cols = 3
+        let rows = 3
+        let xSpacing = (canvasSize.width - padding * 2) / CGFloat(cols - 1)
+        let ySpacing = (canvasSize.height - padding * 2) / CGFloat(rows - 1)
+
+        var dotPositions: [CGPoint] = []
+        for row in 0..<rows {
+            for col in 0..<cols {
+                dotPositions.append(CGPoint(
+                    x: padding + CGFloat(col) * xSpacing,
+                    y: padding + CGFloat(row) * ySpacing
+                ))
+            }
+        }
 
         gestureRecognizer.targetPoints = dotPositions
 

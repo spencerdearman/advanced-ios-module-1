@@ -42,7 +42,7 @@ class Page1ViewController: StoryPageViewController {
         // Fly toward the top-right corner
         let destination = CGPoint(
             x: view.bounds.width * 0.75,
-            y: view.bounds.height * 0.15
+            y: view.bounds.height * 0.25
         )
         let startCenter = ticoImageView.center
         let dx = destination.x - startCenter.x

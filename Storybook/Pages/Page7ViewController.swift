@@ -22,31 +22,16 @@ class Page7ViewController: StoryPageViewController {
         ticoImageView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(ticoImageView)
 
-        // "Play Wave Sound" button
-        let soundButton = UIButton(type: .system)
-        let wavesConfig = UIImage.SymbolConfiguration(pointSize: 22, weight: .bold)
-        soundButton.setImage(UIImage(systemName: "water.waves", withConfiguration: wavesConfig), for: .normal)
-        soundButton.setTitle("  Hear the Waves", for: .normal)
-        soundButton.titleLabel?.font = .systemFont(ofSize: 18, weight: .bold)
-        soundButton.tintColor = .white
-        soundButton.backgroundColor = UIColor(red: 0.1, green: 0.5, blue: 0.8, alpha: 1.0)
-        soundButton.layer.cornerRadius = 22
-        soundButton.translatesAutoresizingMaskIntoConstraints = false
-        soundButton.addTarget(self, action: #selector(playSplash), for: .touchUpInside)
-        view.addSubview(soundButton)
-
         NSLayoutConstraint.activate([
             ticoImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor, constant: 260),
             ticoImageView.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: -40),
             ticoImageView.widthAnchor.constraint(equalToConstant: 300),
             ticoImageView.heightAnchor.constraint(equalToConstant: 300),
-
-            // Position button in the top area so it doesn't overlap with the text
-            soundButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -30),
-            soundButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 60),
-            soundButton.widthAnchor.constraint(equalToConstant: 240),
-            soundButton.heightAnchor.constraint(equalToConstant: 44),
         ])
+    }
+
+    override func additionalTopBarItems() -> [UIView] {
+        return [makeTopBarButton(title: "Hear the Waves", systemImage: "water.waves", action: #selector(playSplash), tintColor: .systemBlue)]
     }
 
     @objc private func playSplash() {

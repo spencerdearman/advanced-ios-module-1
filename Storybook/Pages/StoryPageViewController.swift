@@ -244,10 +244,10 @@ class StoryPageViewController: UIViewController {
 
     private func updateReadButtonForSpeaking(_ speaking: Bool) {
         guard let btn = readButton else { return }
-        let config = UIImage.SymbolConfiguration(pointSize: 14, weight: .bold)
+        let config = UIImage.SymbolConfiguration(pointSize: 13, weight: .bold)
         if speaking {
-            btn.setImage(UIImage(systemName: "stop.fill", withConfiguration: config), for: .normal)
-            btn.setTitle(" Stop Reading", for: .normal)
+            btn.setImage(UIImage(systemName: "pause.fill", withConfiguration: config), for: .normal)
+            btn.setTitle(" Pause", for: .normal)
         } else {
             btn.setImage(UIImage(systemName: "play.fill", withConfiguration: config), for: .normal)
             btn.setTitle(" Read to Me", for: .normal)
@@ -258,33 +258,56 @@ class StoryPageViewController: UIViewController {
 
     private var readButton: UIButton?
 
+    private static let topBarFontSize: CGFloat = 14
+    private static let topBarIconSize: CGFloat = 13
+
     private func setupTopBar() {
+        let fontSize = Self.topBarFontSize
+        let iconSize = Self.topBarIconSize
+
+        // Left: Home button
         let homeContainer = makeBlurCapsule()
         view.addSubview(homeContainer)
 
         let homeButton = UIButton(type: .system)
-        let homeConfig = UIImage.SymbolConfiguration(pointSize: 14, weight: .bold)
+        let homeConfig = UIImage.SymbolConfiguration(pointSize: iconSize, weight: .bold)
         homeButton.setImage(UIImage(systemName: "house.fill", withConfiguration: homeConfig), for: .normal)
         homeButton.setTitle(" Return to Home", for: .normal)
-        homeButton.titleLabel?.font = .systemFont(ofSize: 15, weight: .bold)
+        homeButton.titleLabel?.font = .systemFont(ofSize: fontSize, weight: .bold)
         homeButton.tintColor = .black
         homeButton.addTarget(self, action: #selector(homeTapped), for: .touchUpInside)
         homeButton.translatesAutoresizingMaskIntoConstraints = false
         homeContainer.contentView.addSubview(homeButton)
 
-        // "Read to Me" button — only shown if tap-to-play is enabled in settings
-        let showTapToPlay = UserDefaults.standard.bool(forKey: "tapToPlayEnabled")
-        var readContainerTrailing: NSLayoutConstraint?
+        NSLayoutConstraint.activate([
+            homeButton.topAnchor.constraint(equalTo: homeContainer.contentView.topAnchor, constant: 8),
+            homeButton.bottomAnchor.constraint(equalTo: homeContainer.contentView.bottomAnchor, constant: -8),
+            homeButton.leadingAnchor.constraint(equalTo: homeContainer.contentView.leadingAnchor, constant: 14),
+            homeButton.trailingAnchor.constraint(equalTo: homeContainer.contentView.trailingAnchor, constant: -14),
+        ])
 
+        // Right side: horizontal stack of capsules
+        let rightStack = UIStackView()
+        rightStack.axis = .horizontal
+        rightStack.spacing = 10
+        rightStack.alignment = .fill
+        rightStack.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(rightStack)
+
+        // 1. Custom buttons from subclasses (e.g. "Hear the Waves")
+        for item in additionalTopBarItems() {
+            rightStack.addArrangedSubview(item)
+        }
+
+        // 2. Read to Me (if enabled)
+        let showTapToPlay = UserDefaults.standard.bool(forKey: "tapToPlayEnabled")
         if showTapToPlay {
             let readContainer = makeBlurCapsule()
-            view.addSubview(readContainer)
-
             let btn = UIButton(type: .system)
-            let playConfig = UIImage.SymbolConfiguration(pointSize: 14, weight: .bold)
+            let playConfig = UIImage.SymbolConfiguration(pointSize: iconSize, weight: .bold)
             btn.setImage(UIImage(systemName: "play.fill", withConfiguration: playConfig), for: .normal)
             btn.setTitle(" Read to Me", for: .normal)
-            btn.titleLabel?.font = .systemFont(ofSize: 15, weight: .bold)
+            btn.titleLabel?.font = .systemFont(ofSize: fontSize, weight: .bold)
             btn.tintColor = .black
             btn.addTarget(self, action: #selector(readToMeTapped(_:)), for: .touchUpInside)
             btn.translatesAutoresizingMaskIntoConstraints = false
@@ -292,40 +315,68 @@ class StoryPageViewController: UIViewController {
             readButton = btn
 
             NSLayoutConstraint.activate([
-                readContainer.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 16),
-                readContainer.leadingAnchor.constraint(equalTo: homeContainer.trailingAnchor, constant: 10),
                 btn.topAnchor.constraint(equalTo: readContainer.contentView.topAnchor, constant: 8),
                 btn.bottomAnchor.constraint(equalTo: readContainer.contentView.bottomAnchor, constant: -8),
                 btn.leadingAnchor.constraint(equalTo: readContainer.contentView.leadingAnchor, constant: 14),
                 btn.trailingAnchor.constraint(equalTo: readContainer.contentView.trailingAnchor, constant: -14),
             ])
+            rightStack.addArrangedSubview(readContainer)
         }
 
+        // 3. Page label (rightmost)
         let pageContainer = makeBlurCapsule()
-        view.addSubview(pageContainer)
-
         let pageLabel = UILabel()
         pageLabel.text = "Page \(pageIndex + 1) of \(totalPages)"
-        pageLabel.font = .systemFont(ofSize: 15, weight: .bold)
+        pageLabel.font = .systemFont(ofSize: fontSize, weight: .bold)
         pageLabel.textColor = .black
         pageLabel.translatesAutoresizingMaskIntoConstraints = false
         pageContainer.contentView.addSubview(pageLabel)
 
         NSLayoutConstraint.activate([
-            homeContainer.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 16),
-            homeContainer.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
-            homeButton.topAnchor.constraint(equalTo: homeContainer.contentView.topAnchor, constant: 8),
-            homeButton.bottomAnchor.constraint(equalTo: homeContainer.contentView.bottomAnchor, constant: -8),
-            homeButton.leadingAnchor.constraint(equalTo: homeContainer.contentView.leadingAnchor, constant: 14),
-            homeButton.trailingAnchor.constraint(equalTo: homeContainer.contentView.trailingAnchor, constant: -14),
-
-            pageContainer.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 16),
-            pageContainer.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
             pageLabel.topAnchor.constraint(equalTo: pageContainer.contentView.topAnchor, constant: 8),
             pageLabel.bottomAnchor.constraint(equalTo: pageContainer.contentView.bottomAnchor, constant: -8),
             pageLabel.leadingAnchor.constraint(equalTo: pageContainer.contentView.leadingAnchor, constant: 14),
             pageLabel.trailingAnchor.constraint(equalTo: pageContainer.contentView.trailingAnchor, constant: -14),
         ])
+        rightStack.addArrangedSubview(pageContainer)
+
+        // All capsules share the same height
+        for sub in rightStack.arrangedSubviews {
+            sub.heightAnchor.constraint(equalTo: homeContainer.heightAnchor).isActive = true
+        }
+
+        NSLayoutConstraint.activate([
+            homeContainer.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 16),
+            homeContainer.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+
+            rightStack.centerYAnchor.constraint(equalTo: homeContainer.centerYAnchor),
+            rightStack.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+        ])
+    }
+
+    /// Override in subclasses to add custom buttons to the right side of the top bar.
+    /// Called before Read to Me and Page label. Use `makeTopBarButton(title:systemImage:action:tintColor:)`.
+    func additionalTopBarItems() -> [UIView] { return [] }
+
+    /// Creates a blur capsule button matching the top bar style.
+    func makeTopBarButton(title: String, systemImage: String, action: Selector, tintColor: UIColor = .black) -> UIVisualEffectView {
+        let container = makeBlurCapsule()
+        let btn = UIButton(type: .system)
+        let config = UIImage.SymbolConfiguration(pointSize: Self.topBarIconSize, weight: .bold)
+        btn.setImage(UIImage(systemName: systemImage, withConfiguration: config), for: .normal)
+        btn.setTitle(" \(title)", for: .normal)
+        btn.titleLabel?.font = .systemFont(ofSize: Self.topBarFontSize, weight: .bold)
+        btn.tintColor = tintColor
+        btn.addTarget(self, action: action, for: .touchUpInside)
+        btn.translatesAutoresizingMaskIntoConstraints = false
+        container.contentView.addSubview(btn)
+        NSLayoutConstraint.activate([
+            btn.topAnchor.constraint(equalTo: container.contentView.topAnchor, constant: 8),
+            btn.bottomAnchor.constraint(equalTo: container.contentView.bottomAnchor, constant: -8),
+            btn.leadingAnchor.constraint(equalTo: container.contentView.leadingAnchor, constant: 14),
+            btn.trailingAnchor.constraint(equalTo: container.contentView.trailingAnchor, constant: -14),
+        ])
+        return container
     }
 
     @objc private func readToMeTapped(_ sender: UIButton) {
